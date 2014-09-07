@@ -8,7 +8,7 @@ import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElementFactory;
 import com.intellij.psi.PsiField;
-import com.intellij.refactoring.RefactoringFactory;
+import com.intellij.psi.PsiStatement;
 
 public class GenerateStaticBuilderActionHandler extends EditorWriteActionHandler {
 
@@ -20,9 +20,11 @@ public class GenerateStaticBuilderActionHandler extends EditorWriteActionHandler
         PsiClass clazz = util.getCurrentClass(editor);
         addBeanConstructors(clazz, psiElementFactory);
         changeFieldsToFinal(clazz, psiElementFactory);
+        addGetters(clazz, psiElementFactory);
         PsiClass builder = getBuilderClass(clazz, psiElementFactory);
-        clazz.add(builder);
-
+        PsiStatement statement = psiElementFactory.createStatementFromText(
+            builder.getText().replace("class", "static class"), clazz);
+        clazz.addBefore(statement, clazz.getRBrace());
     }
 
     protected PsiClass getBuilderClass(PsiClass currentClazz, PsiElementFactory psiElementFactory) {
@@ -49,10 +51,21 @@ public class GenerateStaticBuilderActionHandler extends EditorWriteActionHandler
 
     protected String getSetterText(String fieldName, String fieldType, String builderName) {
         return new StringBuffer()
+            .append("@JsonSetter(\"").append(fieldName).append("\")")
             .append("public ").append(builderName)
             .append(" ")
             .append(fieldName).append("(").append(fieldType).append(" ").append(fieldName).append("){\n")
             .append("this.").append(fieldName).append("=").append(fieldName).append(";").append("return this;\n}\n")
+            .toString();
+    }
+
+    protected String getGetterText(String fieldName, String fieldType) {
+        return new StringBuffer()
+            .append("@JsonGetter(\"").append(fieldName).append("\")")
+            .append("public ").append(fieldType)
+            .append(" get").append(fieldName.substring(0,1).toUpperCase()).append(fieldName.substring(1))
+            .append("(){\n")
+            .append("return this.").append(fieldName).append(";").append("\n}\n")
             .toString();
     }
 
@@ -106,8 +119,19 @@ public class GenerateStaticBuilderActionHandler extends EditorWriteActionHandler
             String fieldType = field.getType().getCanonicalText();
             field.delete();
             StringBuffer finalField = new StringBuffer()
-                .append("public final ").append(fieldType).append(" ").append(fieldName).append(";");
+                .append("private final ").append(fieldType).append(" ").append(fieldName).append(";");
             clazz.add(psiElementFactory.createFieldFromText(finalField.toString(), clazz));
         }
+    }
+
+    protected void addGetters(PsiClass clazz, PsiElementFactory psiElementFactory) {
+        PsiField[] fields = clazz.getFields();
+        for (int i=0;i<fields.length;i++) {
+            PsiField field = fields[i];
+            String fieldName = field.getName();
+            String fieldType = field.getType().getCanonicalText();
+            clazz.add(psiElementFactory.createMethodFromText(getGetterText(fieldName, fieldType), clazz));
+        }
+
     }
 }

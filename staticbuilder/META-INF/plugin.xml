@@ -1,8 +1,8 @@
 <idea-plugin version="2">
-    <name>generate-immutable-pojo-builder</name>
-    <description>Generate immutable builder for POJO Plugin</description>
+    <name>generate-pojo-builder</name>
+    <description>Generate immutable static builder for POJOs</description>
     <resource-bundle>org.cloudname.pojo.Resources</resource-bundle>
-    <version>1.0</version>
+    <version>1.5</version>
     <vendor>Cloudname</vendor>
     <idea-version since-build="8000"/>
 

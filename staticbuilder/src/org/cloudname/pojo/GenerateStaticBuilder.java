@@ -19,7 +19,7 @@ import com.intellij.psi.PsiClass;
  * @author erachitskiy
  */
 public class GenerateStaticBuilder extends EditorAction {
-    public GenerateStaticBuilder(){
+    public GenerateStaticBuilder() {
         super(new GenerateStaticBuilderActionHandler());
     }
     protected GenerateStaticBuilder(EditorActionHandler defaultHandler) {

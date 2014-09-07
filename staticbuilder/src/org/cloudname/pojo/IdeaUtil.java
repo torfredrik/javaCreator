@@ -1,13 +1,11 @@
 package org.cloudname.pojo;
 
-
 import com.intellij.openapi.components.ApplicationComponent;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.PsiManager;
@@ -36,13 +34,6 @@ public class IdeaUtil implements ApplicationComponent {
     public String getComponentName() {
         return "IdeaUtil";
     }
-    public String getCapitalizedPropertyName(PsiField field){
-        return getCapitalizedPropertyName(field.getName());
-    }
-    public String getCapitalizedPropertyName(String fieldName) {
-        return fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
-    }
-
 
     public PsiClass getCurrentClass(final Editor editor){
         if(editor==null){
